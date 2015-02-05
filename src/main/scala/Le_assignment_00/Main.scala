@@ -1,0 +1,96 @@
+package Le_assignment_00
+
+import widgets.MyCanvas
+import utils._
+
+import scala.io.BufferedSource
+import scalafx.Includes._
+import scalafx.application.JFXApp
+import scalafx.application.JFXApp.PrimaryStage
+import scalafx.event.ActionEvent
+import scalafx.scene.Scene
+import scalafx.scene.control._
+import scalafx.scene.layout.{BorderPane, VBox}
+import scalafx.stage.FileChooser
+
+object Main extends JFXApp {
+
+  implicit var viewport = Viewport(0, 0, 0, 0)
+  implicit var window   = Window(0, 0, 0, 0)
+  var vertexes: List[Vertex] = Nil
+  var faces   : List[Face]   = Nil
+
+  val canvas = new MyCanvas()
+
+  stage = new PrimaryStage {
+    title = "Assignment 01"
+    scene = new Scene(800, 600) {
+      root = new BorderPane {
+        top = new VBox {
+          content = List(toolBar)
+        }
+        center = canvas
+      }
+    }
+
+    width onChange((_, _, _) => {
+      canvas.clear()
+      canvas.setViewPort(viewport)
+      canvas.draw(vertexes, faces)
+    })
+
+    height onChange((_, _, _) => {
+      canvas.clear()
+      canvas.setViewPort(viewport)
+      canvas.draw(vertexes, faces)
+    })
+  }
+
+  lazy val toolBar = new ToolBar {
+    val filePathField = new TextField {
+      prefWidth = 200
+    }
+
+    content = List(
+      new Label("Filename:"),
+      filePathField,
+      new Button("Browse") {
+        onAction = (ae: ActionEvent) =>
+          filePathField.text = new FileChooser().showOpenDialog(scene.window.get).getAbsolutePath
+      },
+      new Button("Load") {
+        onAction = (ae: ActionEvent) => onLoadBtnClicked(filePathField.getText)
+      },
+      new Button("Rotate 45") {
+        onAction = (ae: ActionEvent) => {
+          vertexes = vertexes.map(_.toHomogeneousCoord.zRotate(90).toVertex)
+          canvas.clear()
+          canvas.setViewPort(viewport)
+          canvas.draw(vertexes.map(_.mapToViewport), faces)
+        }
+      }
+    )
+  }
+  
+  private def onLoadBtnClicked(path: String): Unit = {
+    val file = io.Source.fromFile(path) // load the file from the path
+    vertexes = Nil
+    faces = Nil
+    parseFile(file)
+    canvas.clear()
+    canvas.setViewPort(viewport)
+    canvas.draw(vertexes.map(_.mapToViewport), faces)
+  }
+
+  private def parseFile(file: BufferedSource): Unit = {
+    val lines = file.getLines().mkString("\n").split("\n") // split by lines
+    lines.map { line =>
+      line.head match {
+        case 'v' => vertexes = vertexes :+ parseVertex(line)
+        case 'f' => faces = faces :+ parseFace(line)
+        case 'w' => window = parseWindow(line)
+        case 's' => viewport = parseViewport(line)
+      }
+    }
+  }
+}
