@@ -11,9 +11,12 @@ import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
 
 class MyCanvas extends Pane {
+  implicit var viewport = Viewport(0, 0, 0, 0)
+  implicit var window   = Window(0, 0, 0, 0)
   private val coordinate = new Label()
   private val canvas = new Canvas()
   private val gc = canvas.graphicsContext2D
+
 
   style = "-fx-background-color: #FFFF00"
   cursor = Cursor.CROSSHAIR
@@ -30,10 +33,12 @@ class MyCanvas extends Pane {
     val w = canvas.getWidth
     val h = canvas.getHeight
 
+    drawViewport()
+
     faces.map { f =>
-      val v1 = vertexes(f.k - 1)
-      val v2 = vertexes(f.l - 1)
-      val v3 = vertexes(f.m - 1)
+      val v1 = vertexes(f.k - 1).mapToViewport
+      val v2 = vertexes(f.l - 1).mapToViewport
+      val v3 = vertexes(f.m - 1).mapToViewport
 
       // connect the vertexes
       gc.strokeLine(w * v1.x, h * v1.y, w * v2.x, h * v2.y)
@@ -50,11 +55,19 @@ class MyCanvas extends Pane {
     }
   }
 
-  def setViewPort(vp: Viewport): Unit ={
+  def drawViewport(): Unit = {
     val w = canvas.getWidth
     val h = canvas.getHeight
-    gc.strokeRect(w * vp.minX, h * vp.minY, w * vp.maxX - w * vp.minX, h * vp.maxY - h * vp.minY)
+    gc.strokeRect(
+      w * viewport.minX, h * viewport.minY,
+      w * viewport.maxX - w * viewport.minX,
+      h * viewport.maxY - h * viewport.minY
+    )
   }
+
+  def setViewPort(vp: Viewport): Unit = viewport = vp
+
+  def setWindow(win: Window): Unit = window = win
 
   def clear(): Unit = {
     gc.setFill(Color.web("#FFFF00"))

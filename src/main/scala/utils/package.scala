@@ -9,6 +9,8 @@ package object utils extends AnyRef with Parser with GraphicOps {
       z = 0
     )
 
+    def transform(matrix: DenseMatrix[Double]) = (matrix * toHomogeneousCoord).toVertex
+
     def toHomogeneousCoord: DenseVector[Double] = DenseVector(x, y, z, 1.0)
   }
 

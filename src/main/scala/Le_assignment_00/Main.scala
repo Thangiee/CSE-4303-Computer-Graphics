@@ -15,8 +15,6 @@ import scalafx.stage.FileChooser
 
 object Main extends JFXApp {
 
-  implicit var viewport = Viewport(0, 0, 0, 0)
-  implicit var window   = Window(0, 0, 0, 0)
   var vertexes: List[Vertex] = Nil
   var faces   : List[Face]   = Nil
 
@@ -33,17 +31,8 @@ object Main extends JFXApp {
       }
     }
 
-    width onChange((_, _, _) => {
-      canvas.clear()
-      canvas.setViewPort(viewport)
-      canvas.draw(vertexes, faces)
-    })
-
-    height onChange((_, _, _) => {
-      canvas.clear()
-      canvas.setViewPort(viewport)
-      canvas.draw(vertexes, faces)
-    })
+    width onChange((_, _, _)  => { canvas.clear(); canvas.draw(vertexes, faces) })
+    height onChange((_, _, _) => { canvas.clear(); canvas.draw(vertexes, faces) })
   }
 
   lazy val toolBar = new ToolBar {
@@ -55,19 +44,10 @@ object Main extends JFXApp {
       new Label("Filename:"),
       filePathField,
       new Button("Browse") {
-        onAction = (ae: ActionEvent) =>
-          filePathField.text = new FileChooser().showOpenDialog(scene.window.get).getAbsolutePath
+        onAction = (ae: ActionEvent) => filePathField.text = new FileChooser().showOpenDialog(scene.window.get).getAbsolutePath
       },
       new Button("Load") {
         onAction = (ae: ActionEvent) => onLoadBtnClicked(filePathField.getText)
-      },
-      new Button("Rotate 45") {
-        onAction = (ae: ActionEvent) => {
-          vertexes = vertexes.map(_.toHomogeneousCoord.zRotate(90).toVertex)
-          canvas.clear()
-          canvas.setViewPort(viewport)
-          canvas.draw(vertexes.map(_.mapToViewport), faces)
-        }
       }
     )
   }
@@ -78,8 +58,7 @@ object Main extends JFXApp {
     faces = Nil
     parseFile(file)
     canvas.clear()
-    canvas.setViewPort(viewport)
-    canvas.draw(vertexes.map(_.mapToViewport), faces)
+    canvas.draw(vertexes, faces)
   }
 
   private def parseFile(file: BufferedSource): Unit = {
@@ -88,8 +67,8 @@ object Main extends JFXApp {
       line.head match {
         case 'v' => vertexes = vertexes :+ parseVertex(line)
         case 'f' => faces = faces :+ parseFace(line)
-        case 'w' => window = parseWindow(line)
-        case 's' => viewport = parseViewport(line)
+        case 'w' => canvas.setWindow(parseWindow(line))
+        case 's' => canvas.setViewPort(parseViewport(line))
       }
     }
   }

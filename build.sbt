@@ -8,10 +8,11 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 
 resolvers ++= Seq("snapshots", "releases").map(Resolver.sonatypeRepo)
 
-val scalaFx = "org.scalafx" % "scalafx_2.11" % "2.2.67-R10"
-val breeze  = "org.scalanlp" %% "breeze-natives" % "0.10"
+val scalaFx       = "org.scalafx" % "scalafx_2.11" % "2.2.67-R10"
+val breeze        = "org.scalanlp" %% "breeze" % "0.10"
+val breezeNatives = "org.scalanlp" %% "breeze-natives" % "0.10"
 
-libraryDependencies ++= Seq(scalaFx, breeze)
+libraryDependencies ++= Seq() :+ breeze :+ scalaFx
 
 libraryDependencies ++= Seq(
   "org.specs2" %% "specs2-core" % "2.4.14" % "test",
