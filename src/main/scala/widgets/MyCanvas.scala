@@ -1,3 +1,8 @@
+// Le, Thang
+// 1000-787-155
+// 2015-02-08
+// Assignment_01
+
 package widgets
 
 import utils._
@@ -11,23 +16,19 @@ import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
 
 class MyCanvas extends Pane {
-  implicit var viewport = Viewport(0, 0, 0, 0)
-  implicit var window   = Window(0, 0, 0, 0)
-  private val coordinate = new Label()
-  private val canvas = new Canvas()
-  private val gc = canvas.graphicsContext2D
+  implicit var viewport   = Viewport(0, 0, 0, 0)
+  implicit var window     = Window(0, 0, 0, 0)
+  private  val coordinate = new Label()
+  private  val canvas     = new Canvas()
+  private  val gc         = canvas.graphicsContext2D
 
 
   style = "-fx-background-color: #FFFF00"
   cursor = Cursor.CROSSHAIR
   content = List(canvas, coordinate)
 
-  width onChange((_, _, newW) => {
-    canvas.width = newW.doubleValue()
-  })
-  height onChange((_, _, newH) => {
-    canvas.height = newH.doubleValue()
-  })
+  width onChange  ((_, _, newW) => canvas.width = newW.doubleValue())
+  height onChange ((_, _, newH) => canvas.height = newH.doubleValue())
 
   def draw(vertexes: List[Vertex], faces: List[Face]): Unit = {
     val w = canvas.getWidth

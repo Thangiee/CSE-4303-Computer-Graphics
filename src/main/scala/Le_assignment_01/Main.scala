@@ -1,4 +1,9 @@
-package Le_assignment_00
+// Le, Thang
+// 1000-787-155
+// 2015-02-08
+// Assignment_01
+
+package Le_assignment_01
 
 import widgets.MyCanvas
 import utils._
