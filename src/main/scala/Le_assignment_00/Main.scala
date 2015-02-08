@@ -23,6 +23,7 @@ object Main extends JFXApp {
   stage = new PrimaryStage {
     title = "Assignment 01"
     scene = new Scene(800, 600) {
+      stylesheets add "css/modena/modena.css"
       root = new BorderPane {
         top = new VBox {
           content = List(toolBar)

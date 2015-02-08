@@ -1,6 +1,6 @@
-import breeze.linalg._
 
-package object utils extends AnyRef with Parser with GraphicOps {
+
+package object utils extends AnyRef with Parser {
 
   case class Vertex(x: Double, y: Double, z: Double) {
     def mapToViewport(implicit w: Window, v: Viewport): Vertex = Vertex(
@@ -9,9 +9,6 @@ package object utils extends AnyRef with Parser with GraphicOps {
       z = 0
     )
 
-    def transform(matrix: DenseMatrix[Double]) = (matrix * toHomogeneousCoord).toVertex
-
-    def toHomogeneousCoord: DenseVector[Double] = DenseVector(x, y, z, 1.0)
   }
 
   case class Face(k: Int, l: Int, m: Int)
