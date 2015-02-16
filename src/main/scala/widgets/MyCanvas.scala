@@ -30,7 +30,7 @@ class MyCanvas extends Pane {
   width onChange  ((_, _, newW) => canvas.width = newW.doubleValue())
   height onChange ((_, _, newH) => canvas.height = newH.doubleValue())
 
-  def draw(vertexes: List[Vertex], faces: List[Face]): Unit = {
+  def draw(vertexes: List[Vertex], faces: List[Face], enableColor: Boolean = false): Unit = {
     val w = canvas.getWidth
     val h = canvas.getHeight
 
@@ -46,13 +46,15 @@ class MyCanvas extends Pane {
       gc.strokeLine(w * v2.x, h * v2.y, w * v3.x, h * v3.y)
       gc.strokeLine(w * v3.x, h * v3.y, w * v1.x, h * v1.y)
 
-      // color in the face
-      gc.setFill(Color.Red)
-      gc.fillPolygon(Seq(
-        (w * v1.x) → (h * v1.y),
-        (w * v2.x) → (h * v2.y),
-        (w * v3.x) → (h * v3.y)
-      ))
+      if (enableColor) {
+        // color in the face
+        gc.setFill(Color.Red)
+        gc.fillPolygon(Seq(
+          (w * v1.x) → (h * v1.y),
+          (w * v2.x) → (h * v2.y),
+          (w * v3.x) → (h * v3.y)
+        ))
+      }
     }
   }
 

@@ -5,6 +5,9 @@
 
 package Le_assignment_01
 
+import javafx.animation.{KeyFrame, Timeline}
+import javafx.event.{ActionEvent, EventHandler}
+
 import utils._
 import widgets.{MyCanvas, MyToolBar}
 
@@ -13,6 +16,7 @@ import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.layout.BorderPane
+import scalafx.util.Duration
 
 object Main extends JFXApp {
 
@@ -22,7 +26,7 @@ object Main extends JFXApp {
   val canvas = new MyCanvas()
   val toolbar = new MyToolBar()
   toolbar.onLoadButtonClick(handleLoadBtnClick)
-  toolbar.onRotateButtonClick(r => println(s"${r.degree}, ${r.steps}, ${r.selectedAxis}"))
+  toolbar.onRotateButtonClick(handleRotateBtnClick)
 
   stage = new PrimaryStage {
     title = "Assignment 01"
@@ -57,5 +61,29 @@ object Main extends JFXApp {
         case 's' => canvas.setViewPort(parseViewport(line))
       }
     }
+  }
+
+  private def handleRotateBtnClick(rotation: DoRotation): Unit = {
+    val degree = rotation.degree / rotation.steps
+
+    val m = rotation.axis match {
+      case "X" => xRotate(degree)
+      case "Y" => yRotate(degree)
+      case "Z" => zRotate(degree)
+    }
+
+    val millis = 2.70078 * math.exp(.00143645 * vertexes.size) // determine duration of each frame for smoother animation
+
+    val frame = new KeyFrame(Duration(millis), new EventHandler[ActionEvent] {
+      override def handle(event: ActionEvent): Unit = {
+        vertexes = vertexes.map(_.transform(m))
+        canvas.clear()
+        canvas.draw(vertexes, faces)
+      }
+    })
+
+    val animation = new Timeline(frame)
+    animation.setCycleCount(rotation.steps)
+    animation.play()
   }
 }
