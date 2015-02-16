@@ -3,7 +3,9 @@
 // 2015-02-08
 // Assignment_01
 
-package object utils extends AnyRef with Parser {
+import breeze.linalg._
+
+package object utils extends AnyRef with Parser with GraphicOps {
 
   case class Vertex(x: Double, y: Double, z: Double) {
     def mapToViewport(implicit w: Window, v: Viewport): Vertex = Vertex(
@@ -12,6 +14,9 @@ package object utils extends AnyRef with Parser {
       z = 0
     )
 
+    def transform(matrix: DenseMatrix[Double]) = (matrix * toHomogeneousCoord).toVertex
+
+    def toHomogeneousCoord: DenseVector[Double] = DenseVector(x, y, z, 1.0)
   }
 
   case class Face(k: Int, l: Int, m: Int)
@@ -20,7 +25,7 @@ package object utils extends AnyRef with Parser {
 
   case class Viewport(minX: Double, minY: Double, maxX: Double, maxY: Double)
 
-  case class DoRotation(degree: Double, steps: Int, selectedAxis: String)
+  case class DoRotation(degree: Double, steps: Int, axis: String)
 
   case class DoScale()
 }

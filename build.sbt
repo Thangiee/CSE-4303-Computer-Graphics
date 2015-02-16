@@ -12,7 +12,7 @@ val scalaFx       = "org.scalafx" %% "scalafx" % "8.0.31-R7"
 val breeze        = "org.scalanlp" %% "breeze" % "0.10"
 val breezeNatives = "org.scalanlp" %% "breeze-natives" % "0.10"
 
-libraryDependencies ++= Seq() :+ scalaFx
+libraryDependencies ++= Seq() :+ scalaFx :+ breeze
 
 libraryDependencies ++= Seq(
   "org.specs2" %% "specs2-core" % "2.4.14" % "test",
