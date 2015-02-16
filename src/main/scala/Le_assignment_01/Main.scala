@@ -5,18 +5,14 @@
 
 package Le_assignment_01
 
-import widgets.MyCanvas
 import utils._
+import widgets.{MyCanvas, MyToolBar}
 
 import scala.io.BufferedSource
-import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
-import scalafx.event.ActionEvent
 import scalafx.scene.Scene
-import scalafx.scene.control._
-import scalafx.scene.layout.{BorderPane, VBox}
-import scalafx.stage.FileChooser
+import scalafx.scene.layout.BorderPane
 
 object Main extends JFXApp {
 
@@ -24,15 +20,16 @@ object Main extends JFXApp {
   var faces   : List[Face]   = Nil
 
   val canvas = new MyCanvas()
+  val toolbar = new MyToolBar()
+  toolbar.onLoadButtonClick(handleLoadBtnClick)
+  toolbar.onRotateButtonClick(r => println(s"${r.degree}, ${r.steps}, ${r.selectedAxis}"))
 
   stage = new PrimaryStage {
     title = "Assignment 01"
     scene = new Scene(800, 600) {
       stylesheets add "css/modena/modena.css"
       root = new BorderPane {
-        top = new VBox {
-          content = List(toolBar)
-        }
+        top = toolbar
         center = canvas
       }
     }
@@ -40,25 +37,8 @@ object Main extends JFXApp {
     width onChange((_, _, _)  => { canvas.clear(); canvas.draw(vertexes, faces) })
     height onChange((_, _, _) => { canvas.clear(); canvas.draw(vertexes, faces) })
   }
-
-  lazy val toolBar = new ToolBar {
-    val filePathField = new TextField {
-      prefWidth = 200
-    }
-
-    content = List(
-      new Label("Filename:"),
-      filePathField,
-      new Button("Browse") {
-        onAction = (ae: ActionEvent) => filePathField.text = new FileChooser().showOpenDialog(scene.window.get).getAbsolutePath
-      },
-      new Button("Load") {
-        onAction = (ae: ActionEvent) => onLoadBtnClicked(filePathField.getText)
-      }
-    )
-  }
   
-  private def onLoadBtnClicked(path: String): Unit = {
+  private def handleLoadBtnClick(path: String): Unit = {
     val file = io.Source.fromFile(path) // load the file from the path
     vertexes = Nil
     faces = Nil

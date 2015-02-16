@@ -20,6 +20,9 @@ package object utils extends AnyRef with Parser {
 
   case class Viewport(minX: Double, minY: Double, maxX: Double, maxY: Double)
 
+  case class DoRotation(degree: Double, steps: Int, selectedAxis: String)
+
+  case class DoScale()
 }
 
 
