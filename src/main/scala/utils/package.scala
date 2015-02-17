@@ -27,7 +27,7 @@ package object utils extends AnyRef with Parser with GraphicOps {
 
   case class DoRotation(degree: Double, steps: Int, axis: String)
 
-  case class DoScale()
+  case class DoScale(x: Double, y: Double, z: Double, steps: Int)
 }
 
 

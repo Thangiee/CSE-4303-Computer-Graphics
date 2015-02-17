@@ -27,6 +27,7 @@ object Main extends JFXApp {
   val toolbar = new MyToolBar()
   toolbar.onLoadButtonClick(handleLoadBtnClick)
   toolbar.onRotateButtonClick(handleRotateBtnClick)
+  toolbar.onScaleButtonClick(handleScaleBtnClick)
 
   stage = new PrimaryStage {
     title = "Assignment 01"
@@ -41,7 +42,7 @@ object Main extends JFXApp {
     width onChange((_, _, _)  => { canvas.clear(); canvas.draw(vertexes, faces) })
     height onChange((_, _, _) => { canvas.clear(); canvas.draw(vertexes, faces) })
   }
-  
+
   private def handleLoadBtnClick(path: String): Unit = {
     val file = io.Source.fromFile(path) // load the file from the path
     vertexes = Nil
@@ -65,14 +66,14 @@ object Main extends JFXApp {
 
   private def handleRotateBtnClick(rotation: DoRotation): Unit = {
     val degree = rotation.degree / rotation.steps
+    val millis = 2.70078 * math.exp(.00143645 * vertexes.size) // determine duration of each frame for smoother animation
 
+    // rotation matrix
     val m = rotation.axis match {
       case "X" => xRotate(degree)
       case "Y" => yRotate(degree)
       case "Z" => zRotate(degree)
     }
-
-    val millis = 2.70078 * math.exp(.00143645 * vertexes.size) // determine duration of each frame for smoother animation
 
     val frame = new KeyFrame(Duration(millis), new EventHandler[ActionEvent] {
       override def handle(event: ActionEvent): Unit = {
@@ -84,6 +85,31 @@ object Main extends JFXApp {
 
     val animation = new Timeline(frame)
     animation.setCycleCount(rotation.steps)
+    animation.play()
+  }
+
+  private def handleScaleBtnClick(scaling: DoScale): Unit ={
+    val sx = (scaling.x - 1) / scaling.steps
+    val sy = (scaling.y - 1) / scaling.steps
+    val sz = (scaling.z - 1) / scaling.steps
+    val millis = 2.70078 * math.exp(.00143645 * vertexes.size) // determine duration of each frame for smoother animation
+    var i = 1
+
+    def toScaleFactor(value: Double) = (1 + value * i) / (1 + value * (i - 1))
+
+    val frame = new KeyFrame(Duration(millis), new EventHandler[ActionEvent] {
+      override def handle(event: ActionEvent): Unit = {
+        // scale matrix
+        val m = scale(toScaleFactor(sx), toScaleFactor(sy), toScaleFactor(sz))
+        vertexes = vertexes.map(_.transform(m))
+        canvas.clear()
+        canvas.draw(vertexes, faces)
+        i = i + 1
+      }
+    })
+
+    val animation = new Timeline(frame)
+    animation.setCycleCount(scaling.steps)
     animation.play()
   }
 }

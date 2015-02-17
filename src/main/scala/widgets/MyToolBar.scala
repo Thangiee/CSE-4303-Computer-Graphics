@@ -54,9 +54,7 @@ class MyToolBar() extends ToolBar {
 
     List(
       new Label("Roation Axis:"),
-      axisX,
-      axisY,
-      axisZ,
+      axisX, axisY, axisZ,
       new Label("Degree:"),
       degreeField,
       new Label("Steps:"),
@@ -68,17 +66,37 @@ class MyToolBar() extends ToolBar {
   }
 
   private def toolbar3 = {
+    val scaleToggle = new ToggleGroup()
+    val scaleAll = new RadioButton("All") { toggleGroup = scaleToggle; selected = true }
+    val scaleXYZ = new RadioButton("[Sx,Sy,Sz] A:") { toggleGroup = scaleToggle}
+
+    val scaleAllAmountField = new TextField { prefWidth = 50; text = "1.0" }
+    val scaleXYZAmountField = new TextField { prefWidth = 85; text = "[1,1,1]"; disable = true }
+    val stepsField = new TextField { prefWidth = 50; text = "4" }
+
+    scaleAll.onAction = (ae: ActionEvent) => { scaleAllAmountField.disable = false; scaleXYZAmountField.disable = true }
+    scaleXYZ.onAction = (ae: ActionEvent) => { scaleAllAmountField.disable = true; scaleXYZAmountField.disable = false }
+
+    // get the factor for which x, y, and z are scaled
+    def factor = if (scaleAll.selected.value) {
+      val value = scaleAllAmountField.getText.toDouble
+      (value, value, value) // x, y, and z are same value
+    } else {
+      val values = scaleXYZAmountField.getText.replace("[", "").replace("]", "").split(",").map(_.toDouble) // parse the x, y, and z
+      (values(0), values(1), values(2))
+    }
+
     List(
       new Label("Scale Ratio:"),
-      new RadioButton("All"),
-      new TextField { prefWidth = 50; text = "1.0" },
-      new RadioButton("[Sx,Sy,Sz] A:"),
+      scaleAll,
+      scaleAllAmountField,
+      scaleXYZ,
       new TextField { prefWidth = 85; text = "[0.0,0.0,0.0]"; disable = true },
-      new TextField { prefWidth = 85; text = "[1,1,1]" },
+      scaleXYZAmountField,
       new Label("Steps:"),
-      new TextField { prefWidth = 50; text = "4" },
+      stepsField,
       new Button("Scale") {
-        onAction = (ae: ActionEvent) => scaleBtnClickListener.notify(DoScale())
+        onAction = (ae: ActionEvent) => scaleBtnClickListener.notify(DoScale(factor._1, factor._2, factor._3, stepsField.getText.toInt))
       }
     )
   }
