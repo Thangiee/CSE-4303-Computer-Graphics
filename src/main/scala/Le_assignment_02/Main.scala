@@ -28,6 +28,7 @@ object Main extends JFXApp {
   toolbar.onLoadButtonClick(handleLoadBtnClick)
   toolbar.onRotateButtonClick(handleRotateBtnClick)
   toolbar.onScaleButtonClick(handleScaleBtnClick)
+  toolbar.onTranslateButtonClick(println)
 
   stage = new PrimaryStage {
     title = "Assignment 01"

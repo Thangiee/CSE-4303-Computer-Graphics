@@ -13,13 +13,15 @@ class MyToolBar() extends ToolBar {
   private var loadBtnClickListener: Option[String => Unit] = None
   private var rotateBtnClickListener: Option[DoRotation => Unit] = None
   private var scaleBtnClickListener: Option[DoScale => Unit] = None
+  private var translateBtnClickListener: Option[DoTranslation => Unit] = None
 
   content = new VBox {
     spacing = 8
     children = List(
       new HBox(spacing = 4) { children = toolbar1; alignment = Pos.Center },
       new HBox(spacing = 4) { children = toolbar2; alignment = Pos.Center },
-      new HBox(spacing = 4) { children = toolbar3; alignment = Pos.Center }
+      new HBox(spacing = 4) { children = toolbar3; alignment = Pos.Center },
+      new HBox(spacing = 4) { children = toolbar4; alignment = Pos.Center }
     )
   }
 
@@ -96,7 +98,26 @@ class MyToolBar() extends ToolBar {
       new Label("Steps:"),
       stepsField,
       new Button("Scale") {
-        onAction = (ae: ActionEvent) => scaleBtnClickListener.notify(DoScale(factor._1, factor._2, factor._3, stepsField.getText.toInt))
+        onAction = (ae: ActionEvent) =>
+          scaleBtnClickListener.notify(DoScale(factor._1, factor._2, factor._3, stepsField.getText.toInt))
+      }
+    )
+  }
+
+  private def toolbar4 = {
+    val translationAmountField = new TextField { prefWidth = 85; text = "[10,10,10]" }
+    val stepsAmountField = new TextField { prefWidth = 50; text = "4" }
+
+    List(
+      new Label("Translation ([dx, dy, dz]):"),
+      translationAmountField,
+      new Label("Steps:"),
+      stepsAmountField,
+      new Button("Translate") {
+        onAction = (ae: ActionEvent) => {
+          val values = translationAmountField.getText.replace("[", "").replace("]", "").split(",").map(_.toDouble)
+          translateBtnClickListener.notify(DoTranslation(values(0), values(1), values(2), stepsAmountField.getText.toInt))
+        }
       }
     )
   }
@@ -106,6 +127,8 @@ class MyToolBar() extends ToolBar {
   def onRotateButtonClick(listener: DoRotation => Unit) = rotateBtnClickListener = Some(listener)
 
   def onScaleButtonClick(listener: DoScale => Unit) = scaleBtnClickListener = Some(listener)
+
+  def onTranslateButtonClick(listener: DoTranslation => Unit) = translateBtnClickListener = Some(listener)
 
   implicit class Option2Notify[T](option: Option[T => Unit]) {
     def notify(t: T) = option.map(_(t))
