@@ -35,11 +35,11 @@ package object utils extends AnyRef with Parser with GraphicOps {
 
   case class PRP(x: Int, y: Int, z: Int)
 
-  case class DoRotation(degree: Double, steps: Int, axis: String)
+  case class Rotation(degree: Double, steps: Int, axis: String)
 
-  case class DoScale(x: Double, y: Double, z: Double, steps: Int)
+  case class Scaling(x: Double, y: Double, z: Double, steps: Int)
 
-  case class DoTranslation(dx: Double, dy: Double, dz: Double, steps: Int)
+  case class Translation(dx: Double, dy: Double, dz: Double, steps: Int)
 }
 
 

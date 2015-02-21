@@ -11,9 +11,9 @@ import scalafx.stage.FileChooser
 
 class MyToolBar() extends ToolBar {
   private var loadBtnClickListener: Option[String => Unit] = None
-  private var rotateBtnClickListener: Option[DoRotation => Unit] = None
-  private var scaleBtnClickListener: Option[DoScale => Unit] = None
-  private var translateBtnClickListener: Option[DoTranslation => Unit] = None
+  private var rotateBtnClickListener: Option[Rotation => Unit] = None
+  private var scaleBtnClickListener: Option[Scaling => Unit] = None
+  private var translateBtnClickListener: Option[Translation => Unit] = None
 
   content = new VBox {
     spacing = 8
@@ -62,7 +62,7 @@ class MyToolBar() extends ToolBar {
       new Label("Steps:"),
       stepsField,
       new Button("Rotate") {
-        onAction = (ae: ActionEvent) => rotateBtnClickListener.notify(DoRotation(degreeField.getText.toDouble, stepsField.getText.toInt, selectedAxis))
+        onAction = (ae: ActionEvent) => rotateBtnClickListener.notify(Rotation(degreeField.getText.toDouble, stepsField.getText.toInt, selectedAxis))
       }
     )
   }
@@ -99,7 +99,7 @@ class MyToolBar() extends ToolBar {
       stepsField,
       new Button("Scale") {
         onAction = (ae: ActionEvent) =>
-          scaleBtnClickListener.notify(DoScale(factor._1, factor._2, factor._3, stepsField.getText.toInt))
+          scaleBtnClickListener.notify(Scaling(factor._1, factor._2, factor._3, stepsField.getText.toInt))
       }
     )
   }
@@ -116,7 +116,7 @@ class MyToolBar() extends ToolBar {
       new Button("Translate") {
         onAction = (ae: ActionEvent) => {
           val values = translationAmountField.getText.replace("[", "").replace("]", "").split(",").map(_.toDouble)
-          translateBtnClickListener.notify(DoTranslation(values(0), values(1), values(2), stepsAmountField.getText.toInt))
+          translateBtnClickListener.notify(Translation(values(0), values(1), values(2), stepsAmountField.getText.toInt))
         }
       }
     )
@@ -124,11 +124,11 @@ class MyToolBar() extends ToolBar {
 
   def onLoadButtonClick(listener: String => Unit) = loadBtnClickListener = Some(listener)
 
-  def onRotateButtonClick(listener: DoRotation => Unit) = rotateBtnClickListener = Some(listener)
+  def onRotateButtonClick(listener: Rotation => Unit) = rotateBtnClickListener = Some(listener)
 
-  def onScaleButtonClick(listener: DoScale => Unit) = scaleBtnClickListener = Some(listener)
+  def onScaleButtonClick(listener: Scaling => Unit) = scaleBtnClickListener = Some(listener)
 
-  def onTranslateButtonClick(listener: DoTranslation => Unit) = translateBtnClickListener = Some(listener)
+  def onTranslateButtonClick(listener: Translation => Unit) = translateBtnClickListener = Some(listener)
 
   implicit class Option2Notify[T](option: Option[T => Unit]) {
     def notify(t: T) = option.map(_(t))

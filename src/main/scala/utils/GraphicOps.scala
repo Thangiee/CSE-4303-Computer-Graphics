@@ -5,7 +5,7 @@ import math._
 
 trait GraphicOps {
 
-  def translation(dx: Double = 0.0, dy: Double = 0.0, dz: Double = 0.0): DenseMatrix[Double] = {
+  def translate(dx: Double = 0.0, dy: Double = 0.0, dz: Double = 0.0): DenseMatrix[Double] = {
     DenseMatrix(
       (1.0, 0.0, 0.0, dx),
       (0.0, 1.0, 0.0, dy),
@@ -57,7 +57,7 @@ trait GraphicOps {
   }
 
   implicit class RichDenseMatrix(matrix: DenseMatrix[Double]) {
-    def translation(dx: Double = 0.0, dy: Double = 0.0, dz: Double = 0.0): DenseMatrix[Double] = matrix * GraphicOps.translation(dx, dy, dz)
+    def translation(dx: Double = 0.0, dy: Double = 0.0, dz: Double = 0.0): DenseMatrix[Double] = matrix * GraphicOps.translate(dx, dy, dz)
     def scale(sx: Double = 1.0, sy: Double = 1.0, sz: Double = 1.0): DenseMatrix[Double] = matrix * GraphicOps.scale(sx, sy, sz)
     def xRotate(deg: Double): DenseMatrix[Double] = matrix * GraphicOps.xRotate(deg)
     def yRotate(deg: Double): DenseMatrix[Double] = matrix * GraphicOps.yRotate(deg)

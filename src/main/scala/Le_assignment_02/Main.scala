@@ -26,8 +26,8 @@ object Main extends JFXApp {
   val canvas = new MyCanvas()
   val toolbar = new MyToolBar()
   toolbar.onLoadButtonClick(handleLoadBtnClick)
-  toolbar.onRotateButtonClick(handleRotateBtnClick)
-  toolbar.onScaleButtonClick(handleScaleBtnClick)
+  toolbar.onRotateButtonClick(rotateFigure)
+  toolbar.onScaleButtonClick(scaleFigure)
   toolbar.onTranslateButtonClick(println)
 
   stage = new PrimaryStage {
@@ -65,7 +65,7 @@ object Main extends JFXApp {
     }
   }
 
-  private def handleRotateBtnClick(rotation: DoRotation): Unit = {
+  private def rotateFigure(rotation: Rotation): Unit = {
     val degree = rotation.degree / rotation.steps
     val millis = 2.70078 * math.exp(.00143645 * vertexes.size) // determine duration of each frame for smoother animation
 
@@ -89,7 +89,7 @@ object Main extends JFXApp {
     animation.play()
   }
 
-  private def handleScaleBtnClick(scaling: DoScale): Unit ={
+  private def scaleFigure(scaling: Scaling): Unit ={
     val sx = (scaling.x - 1) / scaling.steps
     val sy = (scaling.y - 1) / scaling.steps
     val sz = (scaling.z - 1) / scaling.steps
