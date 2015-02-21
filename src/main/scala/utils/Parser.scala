@@ -24,7 +24,7 @@ trait Parser {
 
   def parseViewVolume(text: String): ViewVolume = {
     val Array(minU, maxU, minV, maxV, minN, maxN) = text.split("\\s+").tail
-    ViewVolume(minU.toInt, maxU.toInt, minV.toInt, maxV.toInt, minN.toInt, maxN.toInt)
+    ViewVolume(minU.toDouble, maxU.toDouble, minV.toDouble, maxV.toDouble, minN.toDouble, maxN.toDouble)
   }
 
   def parseViewport(text: String): Viewport = {
@@ -34,22 +34,22 @@ trait Parser {
 
   def parseVRP(text: String): VRP = {
     val Array(x, y, z) = text.split("\\s+").tail
-    VRP(x.toInt, y.toInt ,z.toInt)
+    VRP(x.toDouble, y.toDouble ,z.toDouble)
   }
 
   def parseVPN(text: String): VPN = {
     val Array(x, y, z) = text.split("\\s+").tail
-    VPN(x.toInt, y.toInt ,z.toInt)
+    VPN(x.toDouble, y.toDouble ,z.toDouble)
   }
 
   def parseVUP(text: String): VUP = {
     val Array(x, y, z) = text.split("\\s+").tail
-    VUP(x.toInt, y.toInt ,z.toInt)
+    VUP(x.toDouble, y.toDouble ,z.toDouble)
   }
 
   def parsePRP(text: String): PRP = {
     val Array(x, y, z) = text.split("\\s+").tail
-    PRP(x.toInt, y.toInt ,z.toInt)
+    PRP(x.toDouble, y.toDouble ,z.toDouble)
   }
 }
 

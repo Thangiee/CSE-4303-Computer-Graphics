@@ -25,15 +25,15 @@ package object utils extends AnyRef with Parser with GraphicOps {
 
   case class Viewport(minX: Double, minY: Double, maxX: Double, maxY: Double)
 
-  case class ViewVolume(minU: Int, maxU: Int, minV: Int, maxV: Int, minN: Int, maxN: Int)
+  case class ViewVolume(minU: Double, maxU: Double, minV: Double, maxV: Double, minN: Double, maxN: Double)
 
-  case class VRP(x: Int, y: Int, z: Int)
+  case class VRP(x: Double, y: Double, z: Double)
 
-  case class VPN(x: Int, y: Int, z: Int)
+  case class VPN(x: Double, y: Double, z: Double)
 
-  case class VUP(x: Int, y: Int, z: Int)
+  case class VUP(x: Double, y: Double, z: Double)
 
-  case class PRP(x: Int, y: Int, z: Int)
+  case class PRP(x: Double, y: Double, z: Double)
 
   case class Rotation(degree: Double, steps: Int, axis: String)
 
