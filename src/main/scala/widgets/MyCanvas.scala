@@ -17,7 +17,7 @@ import scalafx.scene.paint.Color
 
 class MyCanvas extends Pane {
   implicit var viewport   = Viewport(0, 0, 0, 0)
-  implicit var window     = Window(0, 0, 0, 0)
+  implicit var viewVolume = ViewVolume(0, 0, 0, 0, 0, 0)
   private  val coordinate = new Label()
   private  val canvas     = new Canvas()
   private  val gc         = canvas.graphicsContext2D
@@ -70,7 +70,7 @@ class MyCanvas extends Pane {
 
   def setViewPort(vp: Viewport): Unit = viewport = vp
 
-  def setWindow(win: Window): Unit = window = win
+  def setViewVolume(viewVol: ViewVolume): Unit = viewVolume = viewVol
 
   def clear(): Unit = {
     gc.setFill(Color.web("#FFFF00"))
