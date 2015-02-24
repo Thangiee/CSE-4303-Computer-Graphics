@@ -1,7 +1,8 @@
 package utils
 
 import breeze.linalg._
-import math._
+
+import scala.math._
 
 trait GraphicOps {
 
@@ -118,16 +119,13 @@ trait GraphicOps {
     def xRotate(deg: Double): DenseMatrix[Double] = matrix * GraphicOps.xRotate(deg)
     def yRotate(deg: Double): DenseMatrix[Double] = matrix * GraphicOps.yRotate(deg)
     def zRotate(deg: Double): DenseMatrix[Double] = matrix * GraphicOps.zRotate(deg)
-  }
 
-  implicit class RichDenseVector(vector: DenseVector[Double]) {
-    def toVertex: Vertex = Vertex(vector(0), vector(1), vector(2))
-    def toVPN = VPN(vector(0), vector(1), vector(2))
-    def toVUP = VUP(vector(0), vector(1), vector(2))
-    def toPRP = PRP(vector(0), vector(1), vector(2))
-    def toVRP = VRP(vector(0), vector(1), vector(2))
+    def x(vpn: VPN) = (matrix * vpn.toHomogeneousCoord).toVPN
+    def x(vup: VUP) = (matrix * vup.toHomogeneousCoord).toVUP
+    def x(prp: PRP) = (matrix * prp.toHomogeneousCoord).toPRP
+    def x(vrp: VRP) = (matrix * vrp.toHomogeneousCoord).toVRP
+    def x(vertex: Vertex) = (matrix * vertex.toHomogeneousCoord).toVertex
   }
-
 }
 
 object GraphicOps extends GraphicOps

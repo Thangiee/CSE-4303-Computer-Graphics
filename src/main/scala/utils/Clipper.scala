@@ -87,10 +87,6 @@ trait Clipper {
 
     code
   }
-
-  implicit class RichDouble(`val`: Double) {
-    def between(low: Double, high: Double) = `val` >= low && `val` <= high
-  }
 }
 
 object Clipper extends Clipper

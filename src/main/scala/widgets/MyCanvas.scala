@@ -30,31 +30,26 @@ class MyCanvas extends Pane {
   width onChange  ((_, _, newW) => canvas.width = newW.doubleValue())
   height onChange ((_, _, newH) => canvas.height = newH.doubleValue())
 
-  def draw(vertexes: List[Vertex], faces: List[Face], enableColor: Boolean = false): Unit = {
+  def draw(vertexes: List[Vertex], faces: List[Face]): Unit = {
     val w = canvas.getWidth
     val h = canvas.getHeight
+
+    def drawEdge(v: (Vertex, Vertex)): Unit = {
+      val (v1, v2) = (v._1.mapToViewport(w, h), v._2.mapToViewport(w, h))
+      gc.strokeLine(v1.x, v1.y, v2.x, v2.y)
+    }
 
     drawViewport()
 
     faces.map { f =>
-      val v1 = vertexes(f.k - 1).mapToViewport
-      val v2 = vertexes(f.l - 1).mapToViewport
-      val v3 = vertexes(f.m - 1).mapToViewport
+      val v1 = vertexes(f.k - 1)
+      val v2 = vertexes(f.l - 1)
+      val v3 = vertexes(f.m - 1)
 
-      // connect the vertexes
-      gc.strokeLine(w * v1.x, h * v1.y, w * v2.x, h * v2.y)
-      gc.strokeLine(w * v2.x, h * v2.y, w * v3.x, h * v3.y)
-      gc.strokeLine(w * v3.x, h * v3.y, w * v1.x, h * v1.y)
-
-      if (enableColor) {
-        // color in the face
-        gc.setFill(Color.Red)
-        gc.fillPolygon(Seq(
-          (w * v1.x) → (h * v1.y),
-          (w * v2.x) → (h * v2.y),
-          (w * v3.x) → (h * v3.y)
-        ))
-      }
+      // do clipping then draw the edge
+      clipLine(v1, v2, viewVolume).map(drawEdge)
+      clipLine(v2, v3, viewVolume).map(drawEdge)
+      clipLine(v3, v1, viewVolume).map(drawEdge)
     }
   }
 
