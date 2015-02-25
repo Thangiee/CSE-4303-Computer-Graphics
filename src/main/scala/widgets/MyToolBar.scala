@@ -14,6 +14,7 @@ class MyToolBar() extends ToolBar {
   private var rotateBtnClickListener: Option[Rotation => Unit] = None
   private var scaleBtnClickListener: Option[Scaling => Unit] = None
   private var translateBtnClickListener: Option[Translation => Unit] = None
+  private var flyBtnClickListener: Option[Fly => Unit] = None
 
   content = new VBox {
     spacing = 8
@@ -21,7 +22,8 @@ class MyToolBar() extends ToolBar {
       new HBox(spacing = 4) { children = toolbar1; alignment = Pos.Center },
       new HBox(spacing = 4) { children = toolbar2; alignment = Pos.Center },
       new HBox(spacing = 4) { children = toolbar3; alignment = Pos.Center },
-      new HBox(spacing = 4) { children = toolbar4; alignment = Pos.Center }
+      new HBox(spacing = 4) { children = toolbar4; alignment = Pos.Center },
+      new HBox(spacing = 4) { children = toolbar5; alignment = Pos.Center }
     )
   }
 
@@ -122,6 +124,30 @@ class MyToolBar() extends ToolBar {
     )
   }
 
+  private def toolbar5 = {
+    val stepsAmountField = new TextField { prefWidth = 50; text = "10" }
+    val vrp1Field = new TextField { prefWidth = 85; text = "[0,0,0]" }
+    val vrp2Field = new TextField { prefWidth = 85; text = "[0,0,0]" }
+
+    List(
+      new Label("VRP1([x,y,z]):"),
+      vrp1Field,
+      new Label("VRP2([x,y,z]):"),
+      vrp2Field,
+      new Label("Steps"),
+      stepsAmountField,
+      new Button("Fly") {
+        onAction = (ae: ActionEvent) => {
+          val values1 = vrp1Field.getText.replace("[", "").replace("]", "").split(",").map(_.toDouble)
+          val vrp1 = VRP(values1(0), values1(1), values1(2))
+          val values2 = vrp2Field.getText.replace("[", "").replace("]", "").split(",").map(_.toDouble)
+          val vrp2 = VRP(values2(0), values2(1), values2(2))
+          flyBtnClickListener.notify(Fly(vrp1, vrp2, stepsAmountField.getText.toInt))
+        }
+      }
+    )
+  }
+
   def onLoadButtonClick(listener: String => Unit) = loadBtnClickListener = Some(listener)
 
   def onRotateButtonClick(listener: Rotation => Unit) = rotateBtnClickListener = Some(listener)
@@ -129,6 +155,8 @@ class MyToolBar() extends ToolBar {
   def onScaleButtonClick(listener: Scaling => Unit) = scaleBtnClickListener = Some(listener)
 
   def onTranslateButtonClick(listener: Translation => Unit) = translateBtnClickListener = Some(listener)
+
+  def onFlyButtonClick(listener: Fly => Unit) = flyBtnClickListener = Some(listener)
 
   implicit class Option2Notify[T](option: Option[T => Unit]) {
     def notify(t: T) = option.map(_(t))

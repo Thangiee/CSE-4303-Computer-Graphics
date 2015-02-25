@@ -25,6 +25,8 @@ package object utils extends AnyRef with Parser with GraphicOps with Clipper {
 
   case class Translation(dx: Double, dy: Double, dz: Double, steps: Int)
 
+  case class Fly(vrp1: VRP, vrp2: VRP, steps: Int)
+
   def less(a: Double, b:Double) = if (a > b) b else a
 
   implicit class RichDouble(`val`: Double) {
