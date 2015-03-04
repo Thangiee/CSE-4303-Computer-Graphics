@@ -16,12 +16,15 @@ import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
 
 class MyCanvas extends Pane {
-  implicit var viewport   = Viewport(0, 0, 0, 0)
-  implicit var viewVolume = ViewVolume(0, 0, 0, 0, 0, 0)
-  private  val coordinate = new Label()
-  private  val canvas     = new Canvas()
-  private  val gc         = canvas.graphicsContext2D
-
+  private implicit var _viewport = Viewport(0, 0, 0, 0)
+  private implicit var _viewVol  = ViewVolume(0, 0, 0, 0, 0, 0)
+  private implicit var _window   = Window(0, 0, 0, 0)
+  
+  private val coordinate = new Label()
+  private val canvas     = new Canvas()
+  private val gc         = canvas.graphicsContext2D
+  private var _vpn       = VPN(0, 0, 0)
+  private var _vup       = VUP(0, 0, 0)
 
   style = "-fx-background-color: #FFFF00"
   cursor = Cursor.CROSSHAIR
@@ -35,8 +38,8 @@ class MyCanvas extends Pane {
     val h = canvas.getHeight
 
     def drawEdge(v: (Vertex, Vertex)): Unit = {
-      val (v1, v2) = (v._1.mapToViewport(w, h), v._2.mapToViewport(w, h))
-      gc.strokeLine(v1.x, v1.y, v2.x, v2.y)
+      val (v1, v2) = (v._1.mapToViewport, v._2.mapToViewport)
+      gc.strokeLine(w * v1.x, h * v1.y, w * v2.x, h * v2.y)
     }
 
     drawViewport()
@@ -56,16 +59,40 @@ class MyCanvas extends Pane {
   def drawViewport(): Unit = {
     val w = canvas.getWidth
     val h = canvas.getHeight
+
+//    def fit(x: Double) = if (x == 0) 0.0 else 1.692 * x + 0.018
+//    gc.stroke = Color.Red
+//    gc.strokeLine(50, 50, 25 * fit(vpn.x) + 50, 25 * fit(vpn.y) + 50)
+//    gc.strokeText("N", 25 * fit(vpn.x) + 55, 25 * fit(vpn.y) + 55)
+//    gc.stroke = Color.Blue
+//    gc.strokeLine(50, 50, 25 * fit(vup.x) + 50, 25 * fit(vup.y) + 50)
+//    gc.strokeText("U", 25 * fit(vup.x) + 55, 25 * fit(vup.y) + 55)
+//    gc.stroke = Color.Green
+//    gc.strokeLine(50, 50, 25 * fit(vpn.y * vup.z - vpn.z * vup.y) + 50, 25 * fit(vpn.z * vup.x - vpn.x * vup.z) + 50)
+//    gc.strokeText("NxU", 25 * fit(vpn.y * vup.z - vpn.z * vup.y) + 55, 25 * fit(vpn.z * vup.x - vpn.x * vup.z) + 55)
+//    gc.stroke = Color.Black
+
     gc.strokeRect(
-      w * viewport.minX, h * viewport.minY,
-      w * viewport.maxX - w * viewport.minX,
-      h * viewport.maxY - h * viewport.minY
+      w * _viewport.minX, h * _viewport.minY,
+      w * _viewport.maxX - w * _viewport.minX,
+      h * _viewport.maxY - h * _viewport.minY
     )
   }
 
-  def setViewPort(vp: Viewport): Unit = viewport = vp
+  def vpn = _vpn
+  def vpn_=(vpn: VPN) = _vpn = vpn
 
-  def setViewVolume(viewVol: ViewVolume): Unit = viewVolume = viewVol
+  def vup = _vup
+  def vup_=(vup: VUP) = _vup = vup
+
+  def viewport = _viewport
+  def viewport_=(vp: Viewport) = _viewport = vp
+
+  def viewVolume = _viewVol
+  def viewVolume_=(vv: ViewVolume) = _viewVol = vv
+
+  def window = _window
+  def window_=(window: Window) = _window = window
 
   def clear(): Unit = {
     gc.setFill(Color.web("#FFFF00"))

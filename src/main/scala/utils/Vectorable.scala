@@ -8,6 +8,8 @@ trait Vectorable {
   def z: Double
 
   def toHomogeneousCoord: DenseVector[Double] = DenseVector(x, y, z, 1.0)
+
+  def magnitude: Double = math.sqrt(x*x + y*y + z*z)
 }
 
 case class VRP(x: Double, y: Double, z: Double) extends Vectorable
@@ -20,9 +22,9 @@ case class PRP(x: Double, y: Double, z: Double) extends Vectorable
 
 case class Vertex(x: Double, y: Double, z: Double) extends Vectorable {
 
-  def mapToViewport(w: Double, h: Double)(implicit vv: ViewVolume, v: Viewport): Vertex = Vertex(
-    x = ((x - vv.minU) * ((w * v.maxX - w * v.minX) / (vv.maxU - vv.minU))) + (w * v.minX),
-    y = (h * v.maxY) - (y - vv.minV) * ((h * v.maxY - h * v.minY) / (vv.maxV - vv.minV)),
+  def mapToViewport(implicit w: Window, v: Viewport): Vertex = Vertex(
+    x = (v.maxX - v.minX) / (w.maxX - w.minX) * (x - w.minX) + v.minX,
+    y = (v.maxY - v.minY) / (w.maxY - w.minY) * (w.maxY - y) + v.minY,
     z = 0
   )
 }

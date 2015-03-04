@@ -36,8 +36,8 @@ trait GraphicOps {
   }
 
   def yRotate(deg: Double): DenseMatrix[Double] = {
-    val c = cos(toRadians(deg))
-    val s = sin(toRadians(deg))
+    val c = cos(toRadians(deg)).roundTo(5)
+    val s = sin(toRadians(deg)).roundTo(5)
     DenseMatrix(
       (  c, 0.0,   s, 0.0),
       (0.0, 1.0, 0.0, 0.0),
@@ -47,8 +47,8 @@ trait GraphicOps {
   }
 
   def zRotate(deg: Double): DenseMatrix[Double] = {
-    val c = cos(toRadians(deg))
-    val s = sin(toRadians(deg))
+    val c = cos(toRadians(deg)).roundTo(5)
+    val s = sin(toRadians(deg)).roundTo(5)
     DenseMatrix(
       (  c,  -s, 0.0, 0.0),
       (  s,   c, 0.0, 0.0),
@@ -77,7 +77,7 @@ trait GraphicOps {
 
   def xRotateToPlaneXZ(vpn: VPN): DenseMatrix[Double] = {
     val (x, y, z) = (vpn.x, vpn.y, vpn.z)
-    val v = sqrt(y*y + z*z)
+    val v = sqrt(y*y + z*z).roundTo(5)
     val a = if (y*y + z*z == 0) 1 else y / v
     val b = if (y*y + z*z == 0) 1 else z / v
 
@@ -91,7 +91,7 @@ trait GraphicOps {
 
   def yRotateToAlignZ(vpn: VPN): DenseMatrix[Double] = {
     val (a, b, c) = (vpn.x, vpn.y, vpn.z)
-    val d = sqrt(a*a + c*c)
+    val d = sqrt(a*a + c*c).roundTo(5)
 
     DenseMatrix(
       (c/d, 0.0,-a/d, 0.0),
@@ -103,7 +103,7 @@ trait GraphicOps {
 
   def zRotateToPlaneYZ(vup: VUP): DenseMatrix[Double] = {
     val (a, b, c) = (vup.x, vup.y, vup.z)
-    val d = sqrt(a*a + b*b)
+    val d = sqrt(a*a + b*b).roundTo(5)
 
     DenseMatrix(
       (b/d,-a/d, 0.0, 0.0),
@@ -125,6 +125,8 @@ trait GraphicOps {
     def x(prp: PRP) = (matrix * prp.toHomogeneousCoord).toPRP
     def x(vrp: VRP) = (matrix * vrp.toHomogeneousCoord).toVRP
     def x(vertex: Vertex) = (matrix * vertex.toHomogeneousCoord).toVertex
+
+    def x(that: DenseMatrix[Double]) = Seq(matrix, that).reduce(_ * _)
   }
 }
 

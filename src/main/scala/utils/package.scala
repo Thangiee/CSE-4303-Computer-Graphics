@@ -1,3 +1,5 @@
+import java.text.DecimalFormat
+
 import breeze.linalg.DenseVector
 
 // Le, Thang
@@ -14,7 +16,7 @@ package object utils extends AnyRef with Parser with GraphicOps with Clipper {
   case class Viewport(minX: Double, minY: Double, maxX: Double, maxY: Double)
 
   case class ViewVolume(minU: Double, maxU: Double, minV: Double, maxV: Double, minN: Double, maxN: Double) {
-    def getCenterWindow = CenterWindow((maxU + minU) / 2, (maxV + minV) / 2)
+    def getCenterWindow = CenterWindow((maxU + minU) / 2.0, (maxV + minV) / 2.0)
   }
 
   case class CenterWindow(x: Double, y: Double)
@@ -31,6 +33,11 @@ package object utils extends AnyRef with Parser with GraphicOps with Clipper {
 
   implicit class RichDouble(`val`: Double) {
     def between(low: Double, high: Double) = `val` >= low && `val` <= high
+
+    def roundTo(DecimalPlace: Int): Double = {
+      if (`val`.isNaN) return 0.0
+      new DecimalFormat("###." + ("#" * DecimalPlace)).format(`val`).toDouble
+    }
   }
 
   implicit class RichDenseVector(vector: DenseVector[Double]) {

@@ -10,25 +10,25 @@ import scalafx.scene.layout.{HBox, VBox}
 import scalafx.stage.FileChooser
 
 class MyToolBar() extends ToolBar {
-  private var loadBtnClickListener: Option[String => Unit] = None
-  private var rotateBtnClickListener: Option[Rotation => Unit] = None
-  private var scaleBtnClickListener: Option[Scaling => Unit] = None
+  private var loadBtnClickListener     : Option[String => Unit]      = None
+  private var rotateBtnClickListener   : Option[Rotation => Unit]    = None
+  private var scaleBtnClickListener    : Option[Scaling => Unit]     = None
   private var translateBtnClickListener: Option[Translation => Unit] = None
-  private var flyBtnClickListener: Option[Fly => Unit] = None
+  private var flyBtnClickListener      : Option[Fly => Unit]         = None
 
   content = new VBox {
     spacing = 8
     children = List(
-      new HBox(spacing = 4) { children = toolbar1; alignment = Pos.Center },
-      new HBox(spacing = 4) { children = toolbar2; alignment = Pos.Center },
-      new HBox(spacing = 4) { children = toolbar3; alignment = Pos.Center },
-      new HBox(spacing = 4) { children = toolbar4; alignment = Pos.Center },
-      new HBox(spacing = 4) { children = toolbar5; alignment = Pos.Center }
+      new HBox(spacing = 4) {children = toolbar1; alignment = Pos.Center},
+      new HBox(spacing = 4) {children = toolbar2; alignment = Pos.Center},
+      new HBox(spacing = 4) {children = toolbar3; alignment = Pos.Center},
+      new HBox(spacing = 4) {children = toolbar4; alignment = Pos.Center},
+      new HBox(spacing = 4) {children = toolbar5; alignment = Pos.Center}
     )
   }
 
   private def toolbar1 = {
-    val filePathField = new TextField { prefWidth = 200 }
+    val filePathField = new TextField {prefWidth = 200; text = "pyramid_03.txt"}
 
     List(
       new Label("Filename:"),
@@ -43,12 +43,12 @@ class MyToolBar() extends ToolBar {
   }
 
   private def toolbar2 = {
-    val axisToggle = new ToggleGroup()
-    val degreeField = new TextField { prefWidth = 50; text = "90" }
-    val stepsField = new TextField { prefWidth = 50; text = "4" }
-    val axisX = new RadioButton("X") { toggleGroup = axisToggle; selected = true }
-    val axisY = new RadioButton("Y") { toggleGroup = axisToggle }
-    val axisZ = new RadioButton("Z") { toggleGroup = axisToggle }
+    val axisToggle  = new ToggleGroup()
+    val degreeField = new TextField {prefWidth = 50; text = "90"}
+    val stepsField  = new TextField {prefWidth = 50; text = "100"}
+    val axisX       = new RadioButton("X") {toggleGroup = axisToggle; selected = true}
+    val axisY       = new RadioButton("Y") {toggleGroup = axisToggle}
+    val axisZ       = new RadioButton("Z") {toggleGroup = axisToggle}
 
     def selectedAxis: String = {
       if (axisX.selected.value) "X"
@@ -71,15 +71,15 @@ class MyToolBar() extends ToolBar {
 
   private def toolbar3 = {
     val scaleToggle = new ToggleGroup()
-    val scaleAll = new RadioButton("All") { toggleGroup = scaleToggle; selected = true }
-    val scaleXYZ = new RadioButton("[Sx,Sy,Sz] A:") { toggleGroup = scaleToggle}
+    val scaleAll    = new RadioButton("All") {toggleGroup = scaleToggle; selected = true}
+    val scaleXYZ    = new RadioButton("[Sx,Sy,Sz] A:") {toggleGroup = scaleToggle}
 
-    val scaleAllAmountField = new TextField { prefWidth = 50; text = "1.0" }
-    val scaleXYZAmountField = new TextField { prefWidth = 85; text = "[1,1,1]"; disable = true }
-    val stepsField = new TextField { prefWidth = 50; text = "4" }
+    val scaleAllAmountField = new TextField {prefWidth = 50; text = "2.0"}
+    val scaleXYZAmountField = new TextField {prefWidth = 85; text = "[1,1,1]"; disable = true}
+    val stepsField = new TextField {prefWidth = 50; text = "100"}
 
-    scaleAll.onAction = (ae: ActionEvent) => { scaleAllAmountField.disable = false; scaleXYZAmountField.disable = true }
-    scaleXYZ.onAction = (ae: ActionEvent) => { scaleAllAmountField.disable = true; scaleXYZAmountField.disable = false }
+    scaleAll.onAction = (ae: ActionEvent) => {scaleAllAmountField.disable = false; scaleXYZAmountField.disable = true}
+    scaleXYZ.onAction = (ae: ActionEvent) => {scaleAllAmountField.disable = true; scaleXYZAmountField.disable = false}
 
     // get the factor for which x, y, and z are scaled
     def factor = if (scaleAll.selected.value) {
@@ -95,7 +95,7 @@ class MyToolBar() extends ToolBar {
       scaleAll,
       scaleAllAmountField,
       scaleXYZ,
-      new TextField { prefWidth = 85; text = "[0.0,0.0,0.0]"; disable = true },
+      new TextField {prefWidth = 85; text = "[0.0,0.0,0.0]"; disable = true},
       scaleXYZAmountField,
       new Label("Steps:"),
       stepsField,
@@ -107,8 +107,8 @@ class MyToolBar() extends ToolBar {
   }
 
   private def toolbar4 = {
-    val translationAmountField = new TextField { prefWidth = 85; text = "[10,10,10]" }
-    val stepsAmountField = new TextField { prefWidth = 50; text = "4" }
+    val translationAmountField = new TextField {prefWidth = 85; text = "[10,10,10]"}
+    val stepsAmountField       = new TextField {prefWidth = 50; text = "100"}
 
     List(
       new Label("Translation ([dx, dy, dz]):"),
@@ -125,9 +125,9 @@ class MyToolBar() extends ToolBar {
   }
 
   private def toolbar5 = {
-    val stepsAmountField = new TextField { prefWidth = 50; text = "10" }
-    val vrp1Field = new TextField { prefWidth = 85; text = "[0,0,0]" }
-    val vrp2Field = new TextField { prefWidth = 85; text = "[0,0,0]" }
+    val stepsAmountField = new TextField {prefWidth = 50; text = "100"}
+    val vrp1Field        = new TextField {prefWidth = 85; text = "[0,0.5,0]"}
+    val vrp2Field        = new TextField {prefWidth = 85; text = "[0.5,0,0]"}
 
     List(
       new Label("VRP1([x,y,z]):"),
@@ -143,6 +143,10 @@ class MyToolBar() extends ToolBar {
           val values2 = vrp2Field.getText.replace("[", "").replace("]", "").split(",").map(_.toDouble)
           val vrp2 = VRP(values2(0), values2(1), values2(2))
           flyBtnClickListener.notify(Fly(vrp1, vrp2, stepsAmountField.getText.toInt))
+          // swap points
+          val temp = vrp1Field.getText
+          vrp1Field.text = vrp2Field.getText
+          vrp2Field.text = temp
         }
       }
     )
@@ -161,4 +165,5 @@ class MyToolBar() extends ToolBar {
   implicit class Option2Notify[T](option: Option[T => Unit]) {
     def notify(t: T) = option.map(_(t))
   }
+
 }
