@@ -3,7 +3,7 @@
 // 2015-02-16
 // Assignment_02
 
-package Le_assignment_02
+package Le_assignment_0X
 
 import javafx.animation.{KeyFrame, Timeline}
 import javafx.event.{ActionEvent, EventHandler}
