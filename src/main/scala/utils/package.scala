@@ -1,5 +1,6 @@
 import java.text.DecimalFormat
 
+import Le_assignment_0X._
 import breeze.linalg.DenseVector
 
 // Le, Thang
@@ -8,18 +9,6 @@ import breeze.linalg.DenseVector
 // Assignment_01
 
 package object utils extends AnyRef with Parser with GraphicOps with Clipper {
-
-  case class Face(k: Int, l: Int, m: Int)
-
-  case class Window(minX: Double, minY: Double, maxX: Double, maxY: Double)
-
-  case class Viewport(minX: Double, minY: Double, maxX: Double, maxY: Double)
-
-  case class ViewVolume(minU: Double, maxU: Double, minV: Double, maxV: Double, minN: Double, maxN: Double) {
-    def getCenterWindow = CenterWindow((maxU + minU) / 2.0, (maxV + minV) / 2.0)
-  }
-
-  case class CenterWindow(x: Double, y: Double)
 
   case class Rotation(degree: Double, steps: Int, axis: String)
 

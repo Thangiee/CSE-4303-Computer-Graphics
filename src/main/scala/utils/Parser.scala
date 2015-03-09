@@ -5,6 +5,8 @@
 
 package utils
 
+import Le_assignment_0X._
+
 trait Parser {
 
   def parseVertex(text: String): Vertex = {

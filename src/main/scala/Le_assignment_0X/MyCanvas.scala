@@ -3,7 +3,7 @@
 // 2015-02-08
 // Assignment_01
 
-package widgets
+package Le_assignment_0X
 
 import utils._
 
@@ -33,12 +33,17 @@ class MyCanvas extends Pane {
   width onChange  ((_, _, newW) => canvas.width = newW.doubleValue())
   height onChange ((_, _, newH) => canvas.height = newH.doubleValue())
 
-  def draw(vertexes: List[Vertex], faces: List[Face]): Unit = {
+  def draw(vertexes: Seq[Vertex], faces: Seq[Face], proj: Projection): Unit = {
     val w = canvas.getWidth
     val h = canvas.getHeight
 
     def drawEdge(v: (Vertex, Vertex)): Unit = {
-      val (v1, v2) = (v._1.mapToViewport, v._2.mapToViewport)
+      val (v1, v2) = proj match {
+        case Projection.Parallel =>
+          (v._1.paraMapToViewport, v._2.paraMapToViewport)
+        case Projection.Perspective =>
+          (v._1.perMapToViewport, v._2.perMapToViewport)
+      }
       gc.strokeLine(w * v1.x, h * v1.y, w * v2.x, h * v2.y)
     }
 
@@ -50,27 +55,15 @@ class MyCanvas extends Pane {
       val v3 = vertexes(f.m - 1)
 
       // do clipping then draw the edge
-      clipLine(v1, v2, viewVolume).map(drawEdge)
-      clipLine(v2, v3, viewVolume).map(drawEdge)
-      clipLine(v3, v1, viewVolume).map(drawEdge)
+      clipLine(v1, v2, viewVolume, proj).map(drawEdge)
+      clipLine(v2, v3, viewVolume, proj).map(drawEdge)
+      clipLine(v3, v1, viewVolume, proj).map(drawEdge)
     }
   }
 
   def drawViewport(): Unit = {
     val w = canvas.getWidth
     val h = canvas.getHeight
-
-//    def fit(x: Double) = if (x == 0) 0.0 else 1.692 * x + 0.018
-//    gc.stroke = Color.Red
-//    gc.strokeLine(50, 50, 25 * fit(vpn.x) + 50, 25 * fit(vpn.y) + 50)
-//    gc.strokeText("N", 25 * fit(vpn.x) + 55, 25 * fit(vpn.y) + 55)
-//    gc.stroke = Color.Blue
-//    gc.strokeLine(50, 50, 25 * fit(vup.x) + 50, 25 * fit(vup.y) + 50)
-//    gc.strokeText("U", 25 * fit(vup.x) + 55, 25 * fit(vup.y) + 55)
-//    gc.stroke = Color.Green
-//    gc.strokeLine(50, 50, 25 * fit(vpn.y * vup.z - vpn.z * vup.y) + 50, 25 * fit(vpn.z * vup.x - vpn.x * vup.z) + 50)
-//    gc.strokeText("NxU", 25 * fit(vpn.y * vup.z - vpn.z * vup.y) + 55, 25 * fit(vpn.z * vup.x - vpn.x * vup.z) + 55)
-//    gc.stroke = Color.Black
 
     gc.strokeRect(
       w * _viewport.minX, h * _viewport.minY,

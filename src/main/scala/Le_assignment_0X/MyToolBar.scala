@@ -1,4 +1,4 @@
-package widgets
+package Le_assignment_0X
 
 import utils._
 
@@ -28,7 +28,7 @@ class MyToolBar() extends ToolBar {
   }
 
   private def toolbar1 = {
-    val filePathField = new TextField {prefWidth = 200; text = "pyramid_03.txt"}
+    val filePathField = new TextField {prefWidth = 200; text = "pyramid_04.txt"}
 
     List(
       new Label("Filename:"),

@@ -8,12 +8,12 @@ package Le_assignment_0X
 import javafx.animation.{KeyFrame, Timeline}
 import javafx.event.{ActionEvent, EventHandler}
 
+import Le_assignment_0X.Projection._
 import breeze.linalg.DenseMatrix
 import utils._
-import widgets.{MyCanvas, MyToolBar}
 
+import scala.collection.mutable.ListBuffer
 import scala.io.BufferedSource
-import scala.math.abs
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
@@ -23,16 +23,10 @@ import scalafx.util.Duration
 object Main extends JFXApp {
 
   var path: String = _
-  var vertexes: List[Vertex] = Nil
-  var faces   : List[Face]   = Nil
+  val vertexes = new ListBuffer[Vertex]()
+  val faces    = new ListBuffer[Face]()
+  val cameras  = new ListBuffer[Camera]()
 
-  var vrp: VRP = _
-  var vpn: VPN = _
-  var vup: VUP = _
-  var prp: PRP = _
-  var viewVol: ViewVolume = _
-
-  var modelMatrix: DenseMatrix[Double] = _
   var projMatrix: DenseMatrix[Double] = _
 
   val canvas  = new MyCanvas()
@@ -44,7 +38,7 @@ object Main extends JFXApp {
   toolbar.onFlyButtonClick(flyCamera)
 
   stage = new PrimaryStage {
-    title = "Assignment 03"
+    title = "Assignment 04"
     scene = new Scene(800, 600) {
       stylesheets add "css/modena/modena.css"
       root = new BorderPane {
@@ -53,22 +47,47 @@ object Main extends JFXApp {
       }
     }
 
-    width onChange((_, _, _)  => { canvas.clear(); canvas.draw(vertexes.map(v => modelMatrix x projMatrix x v), faces) })
-    height onChange((_, _, _) => { canvas.clear(); canvas.draw(vertexes.map(v => modelMatrix x projMatrix x v), faces) })
+    width onChange((_, _, _)  => redraw())
+    height onChange((_, _, _) => redraw())
+  }
+
+  private def redraw(): Unit = {
+    canvas.clear()
+
+    // redraw for each of the cameras
+    cameras.map { cam =>
+      cam.projType match {
+        case Projection.Parallel    =>
+          canvas.viewVolume = ViewVolume(minU = 0, maxU = 1, minV = 0, maxV = 1, minN = 0, maxN = 1)
+          canvas.window = Window(minX = 0, minY = 0, maxX = 1, maxY = 1)
+        case Projection.Perspective =>
+          canvas.viewVolume = ViewVolume(minU = -1, maxU = 1, minV = -1, maxV = 1, 0, 1)
+          canvas.window = Window(minX = -1, minY = -1, maxX = 1, maxY = 1)
+      }
+      canvas.viewport = cam.viewport
+      canvas.draw(vertexes.map(v => cam.modelMatrix x projMatrix x v), faces, cam.projType)
+    }
   }
 
   private def parseFile(file: BufferedSource): Unit = {
-    val lines = file.getLines().mkString("\n").split("\n") // split by lines
-    lines.map { line =>
+    file.getLines().mkString("\n").split("\n").map { line =>
       line.head match {
-        case 'v' => vertexes = vertexes :+ parseVertex(line)
-        case 'f' => faces = faces :+ parseFace(line)
-        case 'r' => vrp = parseVRP(line)
-        case 'n' => vpn = parseVPN(line)
-        case 'u' => vup = parseVUP(line)
-        case 'p' => prp = parsePRP(line)
-        case 'w' => viewVol = parseViewVolume(line)
-        case 's' => canvas.viewport = parseViewport(line)
+        case 'v' => vertexes += parseVertex(line)
+        case 'f' => faces += parseFace(line)
+      }
+    }
+
+    io.Source.fromFile("cameras_04.txt").getLines().mkString("\n").split("\n").map { line =>
+      line.head match {
+        case 'c' => cameras += Camera()
+        case 'i' => cameras.last.name = line.split(" ").last
+        case 't' => cameras.last.projType = if (line.contains("parallel")) Parallel else Perspective
+        case 'r' => cameras.last.vrp = parseVRP(line)
+        case 'n' => cameras.last.vpn = parseVPN(line)
+        case 'u' => cameras.last.vup = parseVUP(line)
+        case 'p' => cameras.last.prp = parsePRP(line)
+        case 'w' => cameras.last.viewVolume = parseViewVolume(line)
+        case 's' => cameras.last.viewport = parseViewport(line)
       }
     }
   }
@@ -76,26 +95,18 @@ object Main extends JFXApp {
   private def handleLoadBtnClick(path: String): Unit = {
     this.path = path
     val file = io.Source.fromFile(path) // load the file from the path
-    vertexes = Nil
-    faces = Nil
+    
+    // clear old data if any
+    vertexes.clear()
+    faces.clear()
+    cameras.clear()
+    
     parseFile(file)
+    cameras.map(_.calcModelMatrix())
+    projMatrix = identityMatrix
 
-    modelMatrix = calcParaCompositeMatrix()
-    projMatrix = DenseMatrix(
-      (1.0, 0.0, 0.0, 0.0),
-      (0.0, 1.0, 0.0, 0.0),
-      (0.0, 0.0, 1.0, 0.0),
-      (0.0, 0.0, 0.0, 1.0)
-    )
-
-    println(s"$modelMatrix\n$vrp $vpn $vup $prp $viewVol")
-
-    canvas.vpn = vpn
-    canvas.vup = vup
-    canvas.viewVolume = ViewVolume(minU = 0, maxU = 1, minV = 0, maxV = 1, minN = 0, maxN = 1)
-    canvas.window = Window(minX = 0, minY = 0, maxX = 1, maxY = 1)
-    canvas.clear()
-    canvas.draw(vertexes.map(v => modelMatrix x v), faces)
+    cameras.map(println)
+    redraw()
   }
 
   private def rotateFigure(rotation: Rotation): Unit = {
@@ -112,8 +123,7 @@ object Main extends JFXApp {
     val frame = new KeyFrame(Duration(millis), new EventHandler[ActionEvent] {
       override def handle(event: ActionEvent): Unit = {
         projMatrix = r x projMatrix
-        canvas.clear()
-        canvas.draw(vertexes.map(v => modelMatrix x projMatrix x v), faces)
+        redraw()
       }
     })
 
@@ -137,8 +147,7 @@ object Main extends JFXApp {
         val s = scale(toScaleFactor(sx), toScaleFactor(sy), toScaleFactor(sz)) x translate(0, 0, 0)
 
         projMatrix = projMatrix x s
-        canvas.clear()
-        canvas.draw(vertexes.map(v => modelMatrix x projMatrix x v), faces)
+        redraw()
         i = i + 1
       }
     })
@@ -157,8 +166,7 @@ object Main extends JFXApp {
     val frame = new KeyFrame(Duration(millis), new EventHandler[ActionEvent] {
       override def handle(event: ActionEvent): Unit = {
         projMatrix = translate(dx, dy, dz) x projMatrix
-        canvas.clear()
-        canvas.draw(vertexes.map(v => modelMatrix x projMatrix x v), faces)
+        redraw()
       }
     })
 
@@ -168,132 +176,32 @@ object Main extends JFXApp {
   }
 
   def flyCamera(fly: Fly): Unit = {
-    // todo: find a better way to do this. eww
     val vrp1 = fly.vrp1
     val vrp2 = fly.vrp2
 
     // move camera to vrp 1
-    vertexes = Nil
-    faces = Nil
-    val file = io.Source.fromFile(path) 
-    parseFile(file)
-    vrp = vrp1
     var temp = vrp1
-    modelMatrix = calcParaCompositeMatrix()
-    canvas.clear()
-    canvas.draw(vertexes.map(v => modelMatrix x projMatrix x v), faces)
+    cameras.map(_.vrp = vrp1)
+    cameras.map(_.calcModelMatrix())
+    redraw()
 
     // create matrix to fly to vrp 2
     val dx = (vrp2.x - vrp1.x) / fly.steps
     val dy = (vrp2.y - vrp1.y) / fly.steps
     val dz = (vrp2.z - vrp1.z) / fly.steps
     val millis = 2.70078 * math.exp(.00143645 * vertexes.size) // determine duration of each frame for smoother animation
-    
+
     val frame = new KeyFrame(Duration(millis), new EventHandler[ActionEvent] {
       override def handle(event: ActionEvent): Unit = {
-        vertexes = Nil
-        faces = Nil
-        val file = io.Source.fromFile(path) 
-        parseFile(file)
-        vrp = VRP(temp.x + dx, temp.y + dy, temp.z + dz)
-        temp = vrp
-        modelMatrix = calcParaCompositeMatrix()
-        canvas.clear()
-        canvas.draw(vertexes.map(v => modelMatrix x projMatrix x v), faces)
+        cameras.map(_.vrp = VRP(temp.x + dx, temp.y + dy, temp.z + dz))
+        temp = VRP(temp.x + dx, temp.y + dy, temp.z + dz)
+        cameras.map(_.calcModelMatrix())
+        redraw()
       }
     })
 
     val animation = new Timeline(frame)
     animation.setCycleCount(fly.steps)
     animation.play()
-  }
-
-  private def calcParaCompositeMatrix(): DenseMatrix[Double] = {
-    // Translate VRP to Origin
-    val t = translate(-vrp.x, -vrp.y, -vrp.z)
-    vrp = t x vrp
-
-    // get the matrix to rotate around x util VPN lies in the xz plane positively
-    val rx = xRotateToPlaneXZ(vpn)
-    vpn = rx x vpn
-    vup = rx x vup
-
-    // get the matrix to rotate around y util VPN align with the positive x-axis
-    val ry = yRotateToAlignZ(vpn)
-    vpn = ry x vpn
-    vup = ry x vup
-
-    // get the matrix to rotate around z util VUP lies in the yz plane positively
-    val rz = zRotateToPlaneYZ(vup)
-    vpn = rz x vpn
-    vup = rz x vup
-
-    // find the DOP and shear it to become parallel to the z-axis
-    val cw = viewVol.getCenterWindow
-    val shx = shearXZ((cw.x - prp.x) / prp.z)
-    val shy = shearYZ((cw.y - prp.y) / prp.z)
-    vrp = Seq(shx, shy).reduce(_ * _) x vrp
-    prp = Seq(shx, shy).reduce(_ * _) x prp
-
-    // translate center of window on the front plant to the origin
-    val t2 = translate(-less(viewVol.maxU, viewVol.minU), -less(viewVol.maxV, viewVol.minV), -less(viewVol.maxN, viewVol.minN))
-    vrp = t2 x vrp
-    prp = t2 x prp
-
-    // scale to canonical Viewing Volume (1 x 1 x 1)
-    val sc = scale(
-      sx = 1 / abs(viewVol.maxU - viewVol.minU),
-      sy = 1 / abs(viewVol.maxV - viewVol.minV),
-      sz = 1 / abs(viewVol.maxN - viewVol.minN)
-    )
-    vrp = sc x vrp
-    prp = sc x prp
-
-    Seq(sc, t2, shy, shx, rz, ry, rx, t).reduce(_ * _)
-  }
-
-  private def calcPerCompositeMatrix(): DenseMatrix[Double] = {
-    // Translate VRP to Origin
-    val t = translate(-vrp.x, -vrp.y, -vrp.z)
-    vrp = t x vrp
-
-    // get the matrix to rotate around x util VPN lies in the xz plane positively
-    val rx = xRotateToPlaneXZ(vpn)
-    vpn = rx x vpn
-    vup = rx x vup
-
-    // get the matrix to rotate around y util VPN align with the positive x-axis
-    val ry = yRotateToAlignZ(vpn)
-    vpn = ry x vpn
-    vup = ry x vup
-
-    // get the matrix to rotate around z util VUP lies in the yz plane positively
-    val rz = zRotateToPlaneYZ(vup)
-    vup = rz x vup
-
-    // find the matrix to translate prp to the origin, but don't do the translation
-    // yet since it's easier to find the DOP before the translation
-    val t2 = translate(-prp.x, -prp.y, -prp.z)
-
-    val cw = viewVol.getCenterWindow
-    val (dopX, dopY) = (cw.x - prp.x, cw.y - prp.y)
-
-    // find the matrix to shear the view volume such that the center line becomes the z-axis
-    val shx = shearXZ(dopX / prp.z)
-    val shy = shearYZ(dopY / prp.z)
-
-    prp = Seq(t2, shy, shx).reduce(_ * _) x prp
-    vrp = Seq(t2, shy, shx).reduce(_ * _) x vrp
-
-    val sc = scale(
-      sx = (2 * abs(vrp.z)) / ((viewVol.maxU - viewVol.minU) * (vrp.z + viewVol.maxN)),
-      sy = (2 * abs(vrp.z)) / ((viewVol.maxV - viewVol.minV) * (vrp.z + viewVol.maxN)),
-      sz = 1 / (vrp.z + viewVol.maxN)
-    )
-
-    prp = sc x prp
-    vrp = sc x vrp
-
-    Seq(sc, shy, shx, t2, rz, ry, rz, t).reduce(_ * _)
   }
 }

@@ -1,3 +1,4 @@
+import Le_assignment_0X.{VUP, VPN}
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import utils._
