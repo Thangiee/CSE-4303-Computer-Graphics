@@ -107,7 +107,7 @@ class MyToolBar() extends ToolBar {
   }
 
   private def toolbar4 = {
-    val translationAmountField = new TextField {prefWidth = 85; text = "[10,10,10]"}
+    val translationAmountField = new TextField {prefWidth = 85; text = "[1,1,1]"}
     val stepsAmountField       = new TextField {prefWidth = 50; text = "100"}
 
     List(

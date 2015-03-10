@@ -14,7 +14,7 @@ trait Clipper {
   val Behind = 1  // 000001
   val Inside = 0  // 000000
 
-  def clipLine(vertex0: Vertex, vertex1: Vertex, vv: ViewVolume, proj: Projection): Option[(Vertex, Vertex)] = {
+  def clipLine(vertex0: Vertex, vertex1: Vertex, vv: ViewVolume): Option[(Vertex, Vertex)] = {
 
     def intersection(bound: Double, x0: Double, x1: Double, y0: Double, y1: Double) = {
       x0 + (bound - y0) * (x1 - x0) / (y1 - y0)
@@ -22,8 +22,8 @@ trait Clipper {
 
     var v0 = vertex0
     var v1 = vertex1
-    var outCode0 = getBitCode(v0, vv, proj)
-    var outCode1 = getBitCode(v1, vv, proj)
+    var outCode0 = getBitCode(v0, vv)
+    var outCode1 = getBitCode(v1, vv)
 
     while (true) {
       if ((outCode0 | outCode1) == Inside) {        // trivially accept
@@ -66,10 +66,10 @@ trait Clipper {
         // set the new clipped point and get ready to check the other endpoint
         if (outCode == outCode0) {
           v0 = Vertex(x, y, z)
-          outCode0 = getBitCode(v0, vv, proj)
+          outCode0 = getBitCode(v0, vv)
         } else {
           v1 = Vertex(x, y, z)
-          outCode1 = getBitCode(v1, vv, proj)
+          outCode1 = getBitCode(v1, vv)
         }
       }
     }
@@ -77,7 +77,7 @@ trait Clipper {
     Some((v0, v1))
   }
 
-  def getBitCode(v: Vertex, vv: ViewVolume, proj: Projection): Int = {
+  def getBitCode(v: Vertex, vv: ViewVolume): Int = {
     var code = Inside
 
     if      (v.y > vv.maxV) code |= Above

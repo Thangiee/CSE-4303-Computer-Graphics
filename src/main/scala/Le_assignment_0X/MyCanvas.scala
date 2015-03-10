@@ -38,13 +38,19 @@ class MyCanvas extends Pane {
     val h = canvas.getHeight
 
     def drawEdge(v: (Vertex, Vertex)): Unit = {
-      val (v1, v2) = proj match {
+      // do clipping then draw the edge
+      proj match {
         case Projection.Parallel =>
-          (v._1.paraMapToViewport, v._2.paraMapToViewport)
+          clipLine(v._1, v._2, viewVolume).map { case clippedVertexes =>
+            val (v1, v2) = (clippedVertexes._1.paraMapToViewport, clippedVertexes._2.paraMapToViewport)
+            gc.strokeLine(w * v1.x, h * v1.y, w * v2.x, h * v2.y)
+          }
+
         case Projection.Perspective =>
-          (v._1.perMapToViewport, v._2.perMapToViewport)
+          SutherlandHodgman.clip(v._1.perMapToViewport, v._2.perMapToViewport, viewport, w, h).map {
+            case (v1, v2) => gc.strokeLine(v1.x, v1.y, v2.x, v2.y)
+          }
       }
-      gc.strokeLine(w * v1.x, h * v1.y, w * v2.x, h * v2.y)
     }
 
     drawViewport()
@@ -54,10 +60,9 @@ class MyCanvas extends Pane {
       val v2 = vertexes(f.l - 1)
       val v3 = vertexes(f.m - 1)
 
-      // do clipping then draw the edge
-      clipLine(v1, v2, viewVolume, proj).map(drawEdge)
-      clipLine(v2, v3, viewVolume, proj).map(drawEdge)
-      clipLine(v3, v1, viewVolume, proj).map(drawEdge)
+      drawEdge(v1, v2)
+      drawEdge(v2, v3)
+      drawEdge(v3, v1)
     }
   }
 
